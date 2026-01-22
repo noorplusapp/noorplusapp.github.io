@@ -1,9 +1,28 @@
 <section>
   <h2 class="mb-2">Menu</h2>
-  <p class="text-muted">Settings, profile, and support links.</p>
-  <div class="list-group mt-2">
-    <a class="list-group-item list-group-item-action">Profile</a>
-    <a class="list-group-item list-group-item-action">Settings</a>
-    <a class="list-group-item list-group-item-action">Help & Support</a>
+  <p class="text-muted">Settings and preferences.</p>
+
+  <div class="card p-2 mb-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <strong>Location</strong>
+        <div id="settingsLocation" class="small text-muted">Not set</div>
+      </div>
+      <div>
+        <button id="btnRedetect" class="btn btn-sm btn-outline-primary">Redetect location</button>
+      </div>
+    </div>
   </div>
+
+  <div class="card p-2 mb-2">
+    <div><strong>Calculation</strong></div>
+    <div class="small text-muted mt-1">Method: <span id="settingsMethod">auto</span></div>
+    <div class="small text-muted">Asr: <span id="settingsSchool">auto</span></div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button id="btnClear" class="btn btn-sm btn-outline-secondary">Clear stored data</button>
+    <a class="btn btn-sm btn-link ms-auto" href="#">Help & Support</a>
+  </div>
+
 </section>
