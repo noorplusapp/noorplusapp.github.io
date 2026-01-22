@@ -9,7 +9,7 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
 /* center layout to simulate mobile on all devices */
-.device-shell{max-width:420px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative}
+.device-shell{max-width:420px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
 .container{max-width:1000px;margin:0 auto;padding:1rem}
 .site-header{background:#fff;border-bottom:1px solid #e6e6e9}
 .site-header .container{display:flex;align-items:center;gap:1rem}
@@ -21,8 +21,10 @@ html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-seri
 
 /* bottom navigation styles */
 .bottom-nav{height:64px}
-.bottom-nav .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;border:0;background:transparent;color:var(--text);padding:.25rem .5rem}
-.bottom-nav .home-btn{width:64px;height:64px;border-radius:50%;transform:translateY(-28%);box-shadow:0 6px 14px rgba(11,108,246,0.18);display:flex;align-items:center;justify-content:center}
+.bottom-nav .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;border:0;background:transparent;color:var(--text);padding:.25rem .5rem;transition:background .15s ease}
+.bottom-nav .nav-btn:hover{background:rgba(11,108,246,0.04)}
+.bottom-nav .home-btn{width:64px;height:64px;border-radius:50%;transform:translateY(-28%);box-shadow:0 6px 14px rgba(11,108,246,0.18);display:flex;align-items:center;justify-content:center;transition:transform .12s ease, box-shadow .12s ease}
+.bottom-nav .nav-btn.active .small, .bottom-nav .nav-btn.active i{color:var(--accent)}
 .bottom-nav .nav-btn .small{line-height:1}
 
 /* ensure main content not hidden behind fixed bottom nav */
@@ -30,7 +32,12 @@ html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-seri
 
 /* keep mobile look identical on all screens */
 @media (min-width:421px){
+	/* On larger screens show full-width layout and remove mobile centering */
 	body{background:#e9ecef}
+	.device-shell{max-width:100%;margin:0;background:transparent;box-shadow:none}
+	.container{padding:1.25rem 2rem}
+	/* make bottom nav span full width */
+	.bottom-nav{position:fixed;left:0;right:0;bottom:0}
 }
 
 @media (max-width:420px){
