@@ -160,42 +160,50 @@ class App {
         this.updateDashboard(date, times);
     }
 
-    updateDashboard(date, cachedTimes) {
-        // If cachedTimes is not provided (e.g. from interval), recalculate
-        let times = cachedTimes;
-        if (!times) {
-            times = PrayerTimes.calculate({
-                latitude: CONFIG.latitude,
-                longitude: CONFIG.longitude,
-                date: date,
-                method: CONFIG.method,
-                hanafi: CONFIG.hanafi,
-                offsets: CONFIG.offsets,
-            });
-        }
-
-        // 1. Update Dates
+    updateDashboard(date, times) {
+        // --- 1. Update List Headers (Navigable Date) ---
         this.setText("date-en", date.toLocaleDateString("en-GB", { weekday: 'short', day: "2-digit", month: "long", year: "numeric" }));
-        // Mock Hijri for now (Real app would use Intl.DateTimeFormat with u-ca-islamic)
         this.setText("date-hijri", new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(date));
 
-        // 2. Sunrise / Sunset
         const fmt = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-        this.setText("sunrise-time", fmt(times.Sunrise));
-        this.setText("sunset-time", fmt(times.Maghrib));
 
-        // 3. Determine Current & Next Prayer
+        // If 'times' corresponds to 'date' (navigated date), we show Sunrise/Sunset for THAT date in the list or dashboard?
+        // User requested dashboard to be 'Current Info'.
+        // We will separate the "Live Status" from the "Viewed Date Info".
+
+        // --- 2. Live Status (ALWAYS uses System Time) ---
         const now = new Date();
+        const liveTimes = PrayerTimes.calculate({
+            latitude: CONFIG.latitude,
+            longitude: CONFIG.longitude,
+            date: now,
+            method: CONFIG.method,
+            hanafi: CONFIG.hanafi,
+            offsets: CONFIG.offsets,
+        });
+
+        // displayed sunrise/sunset should probably match the "Now" context or the "Viewed Date" context?
+        // Let's stick to "Viewed Date" for Sunrise/Sunset display if it's part of the schedule grid.
+        // BUT the user said "dashboard section... displayed current prayer... displayed sunrise".
+        // If I change date, usually the dashboard updates to reflect that date's stats?
+        // OR does "Dashboard" mean "Current Status Panel"?
+        // Given "Count down timer", it implies "Current Status".
+        // Let's make the Top Dashboard section ALWAYS showing TODAY'S status.
+        // And the Bottom List showing the NAVIGATED date.
+
+        this.setText("sunrise-time", fmt(liveTimes.Sunrise));
+        this.setText("sunset-time", fmt(liveTimes.Maghrib));
+
         const prayerList = [
-            { name: "Fajr", time: times.Fajr },
-            { name: "Sunrise", time: times.Sunrise }, // Marker
-            { name: "Dhuhr", time: times.Dhuhr },
-            { name: "Asr", time: times.Asr },
-            { name: "Maghrib", time: times.Maghrib },
-            { name: "Isha", time: times.Isha }
+            { name: "Fajr", time: liveTimes.Fajr },
+            { name: "Sunrise", time: liveTimes.Sunrise },
+            { name: "Dhuhr", time: liveTimes.Dhuhr },
+            { name: "Asr", time: liveTimes.Asr },
+            { name: "Maghrib", time: liveTimes.Maghrib },
+            { name: "Isha", time: liveTimes.Isha }
         ];
 
-        // Find next prayer (first one in future)
+        // Find next prayer relative to NOW
         let nextIdx = -1;
         for (let i = 0; i < prayerList.length; i++) {
             if (prayerList[i].time > now) {
@@ -209,47 +217,50 @@ class App {
         if (nextIdx === -1) {
             // All passed today, Next is Fajr Tomorrow
             currentP = prayerList[prayerList.length - 1]; // Isha
-            nextP = { name: "Fajr", time: new Date(times.Fajr.getTime() + 86400000) };
+            nextP = { name: "Fajr", time: new Date(liveTimes.Fajr.getTime() + 86400000) };
         } else if (nextIdx === 0) {
             // Before Fajr
-            currentP = { name: "Isha", time: new Date(times.Isha.getTime() - 86400000) }; // Previous day Isha
+            // Current is previous day's Isha
+            const prevIsha = new Date(liveTimes.Isha.getTime() - 86400000);
+            currentP = { name: "Isha", time: prevIsha };
             nextP = prayerList[0];
         } else {
             currentP = prayerList[nextIdx - 1];
             nextP = prayerList[nextIdx];
         }
 
-        // Logic check: If existing "Sunrise" is the current 'prayer', we usually show Fajr as current 
-        // until Dhuhr? Or show "Sunrise" as current phase?
-        // User asked for "Current Prayer Name". 
-        // Let's treat Sunrise as a phase but if it's the 'current', maybe display "Duha" or keep "Sunrise".
-        // For simplicity, we stick to the list.
-
         this.setText("current-prayer-name", currentP.name);
         this.setText("current-prayer-time", fmt(currentP.time));
         this.setText("next-prayer-name", nextP.name);
         this.setText("next-prayer-time", fmt(nextP.time));
 
-        // 4. Countdown Circle
-        const totalDuration = nextP.time - currentP.time;
-        const elapsed = now - currentP.time;
-        const remaining = nextP.time - now;
+        // --- 3. Countdown Circle ---
+        let totalDuration = nextP.time - currentP.time;
+        let remaining = nextP.time - now;
 
-        // Progress Ratio (0 to 1)
-        // However, we want the circle to 'empty' as time passes, or 'fill'?
-        // Usually "Remaining" means the circle shrinks.
+        // Visual Correction:
+        // If 'currentP' is Sunrise (which is just a moment), the gap to Dhuhr is valid.
+        // If 'currentP' is Isha (Yesterday), gap to Fajr is valid.
+
         let ratio = remaining / totalDuration;
         if (ratio < 0) ratio = 0;
         if (ratio > 1) ratio = 1;
 
         const circle = document.getElementById('countdown-progress');
-        const circumference = 2 * Math.PI * 45; // r=45 -> ~283
+        const circumference = 2 * Math.PI * 45;
         if (circle) {
+            // We want it to "empty" as time goes on.
+            // when full duration remains (ratio 1), offset should be 0 (Full).
+            // when 0 duration remains (ratio 0), offset should be circumference (Empty).
+            // My previous logic: offset = circumference * (1 - ratio).
+            // If ratio 1 -> offset 0. Correct.
+            // If ratio 0 -> offset C. Correct.
             const offset = circumference * (1 - ratio);
             circle.style.strokeDashoffset = offset;
         }
 
         // Timer Text
+        if (remaining < 0) remaining = 0;
         const hrs = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
         const secs = Math.floor((remaining % (1000 * 60)) / 1000);
