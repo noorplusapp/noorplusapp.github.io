@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoorPlus - Premium Islamic App</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons (Phosphor Icons - Lightweight & Modern) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <!-- Main Content Area -->
+    <main id="app-content" class="content-container">
+        <!-- Dynamic content loads here -->
+        <div class="loading-state">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#community" class="nav-item" data-page="community">
+            <i class="ph ph-users"></i>
+            <span>Community</span>
+        </a>
+        <a href="#quran" class="nav-item" data-page="quran">
+            <i class="ph ph-book-open-text"></i>
+            <span>Quran</span>
+        </a>
+        <a href="#home" class="nav-item active" data-page="home">
+            <div class="nav-item-highlight">
+                <i class="ph ph-mosque"></i>
+            </div>
+            <span>Home</span>
+        </a>
+        <a href="#library" class="nav-item" data-page="library">
+            <i class="ph ph-books"></i>
+            <span>Library</span>
+        </a>
+        <a href="#settings" class="nav-item" data-page="settings">
+            <i class="ph ph-gear"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="assets/js/prayer_times.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+
+</html>
