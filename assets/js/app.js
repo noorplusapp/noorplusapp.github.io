@@ -114,6 +114,17 @@ class App {
         safeVal('adj-maghrib', CONFIG.offsets.Maghrib || 0);
         safeVal('adj-isha', CONFIG.offsets.Isha || 0);
 
+        // Populate Summary Text
+        const summaryEl = document.getElementById('current-config-text');
+        if (summaryEl) {
+            summaryEl.innerHTML = `
+                <span style="color:var(--primary)">${CONFIG.method}</span> Method <br>
+                <span style="opacity:0.7; font-size:0.9em">
+                    ${CONFIG.latitude}, ${CONFIG.longitude} • ${CONFIG.hanafi ? 'Hanafi' : 'Standard'}
+                </span>
+            `;
+        }
+
         // Handle Save
         const form = document.getElementById('settings-form');
         if (form) {
@@ -235,17 +246,48 @@ class App {
         // Use new buildPrayerRanges
         const ranges = buildPrayerRanges(times);
 
-        // Helper to format Range {start, end} to string "HH:MM am - HH:MM pm"
+        // Helper to format Range {start, end} to string "HH:MM am"
         const fmt = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-        const formatRange = (range) => `${fmt(range.start)} – ${fmt(range.end)}`;
 
-        // List View - Populate manually since buildPrayerSchedule is gone
-        this.setText("fajr", formatRange(ranges.Fajr));
-        this.setText("dhuhr", formatRange(ranges.Dhuhr));
-        this.setText("asr", formatRange(ranges.Asr));
-        this.setText("maghrib", formatRange(ranges.Maghrib));
-        this.setText("isha", formatRange(ranges.Isha));
-        this.setText("tahajjud", formatRange(ranges.Tahajjud));
+        // List View - Populate manually
+        this.setText("fajr", fmt(ranges.Fajr.start));
+        this.setText("dhuhr", fmt(ranges.Dhuhr.start));
+        this.setText("asr", fmt(ranges.Asr.start));
+        this.setText("maghrib", fmt(ranges.Maghrib.start));
+        this.setText("isha", fmt(ranges.Isha.start));
+        this.setText("tahajjud", fmt(ranges.Tahajjud.start));
+
+        // Highlight Logic
+        // Clear all highlights first
+        const allRows = document.querySelectorAll('.p-row');
+        allRows.forEach(r => r.classList.remove('highlight-row'));
+
+        // Determine which one to highlight (ONLY if date is Today)
+        const today = new Date();
+        const isToday = (date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear());
+
+        if (isToday) {
+            // Recalculate live status to be sure
+            const liveTimes = PrayerTimes.calculate({
+                latitude: CONFIG.latitude,
+                longitude: CONFIG.longitude,
+                date: today,
+                method: CONFIG.method,
+                hanafi: CONFIG.hanafi,
+                offsets: CONFIG.offsets,
+            });
+            const state = getCurrentPrayerState(liveTimes, today);
+
+            if (state.state === 'PRAYER') {
+                const pName = state.prayer.toLowerCase(); // fajr, dhuhr...
+                const el = document.getElementById(pName);
+                if (el && el.parentElement) {
+                    el.parentElement.classList.add('highlight-row');
+                }
+            }
+        }
 
         // Update Dashboard (Live Status)
         this.updateDashboard(date, times);

@@ -122,8 +122,10 @@ body {
 }
 
 .nav-item i {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
+    font-size: 1.8rem;
+    /* Increased from 1.5rem */
+    margin-bottom: 0;
+    /* Remove bottom margin */
     transition: all 0.3s ease;
 }
 
@@ -423,6 +425,26 @@ body {
     padding: 10px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 0.95rem;
+    text-transform: uppercase;
+    /* Uppercase prayer names */
+    letter-spacing: 0.5px;
+}
+
+/* Highlight Active Row */
+.highlight-row {
+    background: rgba(16, 185, 81, 0.1);
+    /* Primary color low opacity */
+    border-radius: 8px;
+    padding: 10px 10px;
+    /* Adjust padding for bg */
+    margin: 0 -10px;
+    /* Negative margin to keep alignment */
+    border-bottom: none;
+    font-weight: 700;
+}
+
+.highlight-row span {
+    color: var(--primary);
 }
 
 .p-row:last-child {

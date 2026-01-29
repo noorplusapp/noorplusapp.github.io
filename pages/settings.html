@@ -1,6 +1,11 @@
 <div class="page-content settings-container">
     <h2>Settings</h2>
 
+    <div class="current-config-card">
+        <h3>Current Configuration</h3>
+        <p id="current-config-text">Loading...</p>
+    </div>
+
     <form id="settings-form">
         <!-- Location Section -->
         <div class="settings-group">
@@ -76,12 +81,31 @@
         padding-bottom: 120px;
     }
 
-    .settings-group {
+    .settings-group,
+    .current-config-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 16px;
         margin-bottom: 20px;
+    }
+
+    .current-config-card {
+        border-left: 4px solid var(--primary);
+    }
+
+    .current-config-card h3 {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .current-config-card p {
+        font-size: 0.95rem;
+        color: var(--text-main);
+        margin-bottom: 0;
+        font-weight: 500;
     }
 
     .settings-group h3 {
