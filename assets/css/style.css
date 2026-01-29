@@ -89,8 +89,11 @@ body {
 .bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 480px;
+    /* Match body max-width */
     height: var(--nav-height);
     background: rgba(15, 23, 42, 0.85);
     /* Glassmorphism */
