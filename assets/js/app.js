@@ -26,6 +26,18 @@ class App {
     }
 
     init() {
+        // Load Config from LocalStorage if exists
+        const saved = localStorage.getItem('prayerConfig');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                // Merge carefully
+                Object.assign(CONFIG, parsed);
+            } catch (e) {
+                console.error("Error parsing saved config", e);
+            }
+        }
+
         // Handle Navigation Clicks
         this.navItems.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -62,6 +74,8 @@ class App {
             // Page Specific Logic
             if (page === 'home') {
                 this.initHome();
+            } else if (page === 'settings') {
+                this.initSettings();
             }
 
         } catch (error) {
@@ -73,6 +87,59 @@ class App {
     stopCheckers() {
         if (this.timerInterval) clearInterval(this.timerInterval);
         if (this.dateToggleInterval) clearInterval(this.dateToggleInterval);
+    }
+
+    /* =========================
+       SETTINGS LOGIC
+    ========================= */
+    initSettings() {
+        // Populate Form
+        const safeVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.value = val;
+        };
+        const safeCheck = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.checked = val;
+        };
+
+        safeVal('latitude', CONFIG.latitude);
+        safeVal('longitude', CONFIG.longitude);
+        safeVal('calc-method', CONFIG.method);
+        safeCheck('juristics', CONFIG.hanafi);
+
+        safeVal('adj-fajr', CONFIG.offsets.Fajr || 0);
+        safeVal('adj-dhuhr', CONFIG.offsets.Dhuhr || 0);
+        safeVal('adj-asr', CONFIG.offsets.Asr || 0);
+        safeVal('adj-maghrib', CONFIG.offsets.Maghrib || 0);
+        safeVal('adj-isha', CONFIG.offsets.Isha || 0);
+
+        // Handle Save
+        const form = document.getElementById('settings-form');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Update Config
+                CONFIG.latitude = parseFloat(document.getElementById('latitude').value);
+                CONFIG.longitude = parseFloat(document.getElementById('longitude').value);
+                CONFIG.method = document.getElementById('calc-method').value;
+                CONFIG.hanafi = document.getElementById('juristics').checked;
+
+                CONFIG.offsets = {
+                    Fajr: parseInt(document.getElementById('adj-fajr').value) || 0,
+                    Dhuhr: parseInt(document.getElementById('adj-dhuhr').value) || 0,
+                    Asr: parseInt(document.getElementById('adj-asr').value) || 0,
+                    Maghrib: parseInt(document.getElementById('adj-maghrib').value) || 0,
+                    Isha: parseInt(document.getElementById('adj-isha').value) || 0,
+                };
+
+                // Save to LocalStorage
+                localStorage.setItem('prayerConfig', JSON.stringify(CONFIG));
+
+                alert('Settings Saved!');
+            });
+        }
     }
 
     /* =========================

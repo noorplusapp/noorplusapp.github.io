@@ -1,4 +1,206 @@
-<div class="page-content">
-    <h1>Settings</h1>
-    <p>Application settings will go here.</p>
+<div class="page-content settings-container">
+    <h2>Settings</h2>
+
+    <form id="settings-form">
+        <!-- Location Section -->
+        <div class="settings-group">
+            <h3>Location</h3>
+            <div class="form-item">
+                <label for="latitude">Latitude</label>
+                <input type="number" id="latitude" step="0.01" class="input-field" placeholder="e.g. 23.81">
+            </div>
+            <div class="form-item">
+                <label for="longitude">Longitude</label>
+                <input type="number" id="longitude" step="0.01" class="input-field" placeholder="e.g. 90.41">
+            </div>
+            <!-- Future: Auto-detect button -->
+        </div>
+
+        <!-- Calculation Config -->
+        <div class="settings-group">
+            <h3>Calculation Method</h3>
+            <div class="form-item">
+                <label for="calc-method">Method</label>
+                <select id="calc-method" class="input-select">
+                    <option value="Karachi">Karachi (Hanafi)</option>
+                    <option value="MWL">Muslim World League</option>
+                    <option value="ISNA">ISNA (North America)</option>
+                    <option value="Egypt">Egypt</option>
+                    <option value="UmmAlQura">Umm Al-Qura (Makkah)</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+            <div class="form-item toggle-row">
+                <label for="juristics">Asr Juristic (Hanafi)</label>
+                <label class="switch">
+                    <input type="checkbox" id="juristics">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Offsets -->
+        <div class="settings-group">
+            <h3>Adjustments (Minutes)</h3>
+            <div class="form-item">
+                <label for="adj-fajr">Fajr</label>
+                <input type="number" id="adj-fajr" class="input-field" value="0">
+            </div>
+            <div class="form-item">
+                <label for="adj-dhuhr">Dhuhr</label>
+                <input type="number" id="adj-dhuhr" class="input-field" value="0">
+            </div>
+            <div class="form-item">
+                <label for="adj-asr">Asr</label>
+                <input type="number" id="adj-asr" class="input-field" value="0">
+            </div>
+            <div class="form-item">
+                <label for="adj-maghrib">Maghrib</label>
+                <input type="number" id="adj-maghrib" class="input-field" value="0">
+            </div>
+            <div class="form-item">
+                <label for="adj-isha">Isha</label>
+                <input type="number" id="adj-isha" class="input-field" value="0">
+            </div>
+        </div>
+
+        <div class="settings-actions">
+            <button type="submit" class="btn-primary">Save Settings</button>
+        </div>
+    </form>
 </div>
+
+<style>
+    /* Scoped Styles for Settings */
+    .settings-container {
+        padding-bottom: 120px;
+    }
+
+    .settings-group {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .settings-group h3 {
+        font-size: 0.95rem;
+        color: var(--primary);
+        margin-bottom: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-item {
+        margin-bottom: 12px;
+    }
+
+    .form-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+
+    .input-field,
+    .input-select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        color: var(--text-main);
+        font-size: 1rem;
+        font-family: inherit;
+    }
+
+    .input-field:focus,
+    .input-select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .toggle-row label:first-child {
+        margin-bottom: 0;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--bg-dark);
+        transition: .4s;
+        border: 1px solid var(--border);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked+.slider {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(20px);
+    }
+
+    .slider.round {
+        border-radius: 24px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .btn-primary {
+        width: 100%;
+        background: var(--gradient-primary);
+        color: white;
+        font-weight: 600;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 1rem;
+        box-shadow: 0 4px 12px var(--primary-glow);
+        transition: transform 0.2s;
+    }
+
+    .btn-primary:active {
+        transform: scale(0.98);
+    }
+</style>
