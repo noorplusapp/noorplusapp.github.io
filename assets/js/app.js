@@ -107,22 +107,31 @@ class App {
     }
 
     setupDateToggle() {
-        let showEnglish = true;
+        let state = 0; // 0: Today, 1: English, 2: Hijri
+        const todayEl = document.getElementById('date-today');
         const enEl = document.getElementById('date-en');
         const hijriEl = document.getElementById('date-hijri');
 
-        if (!enEl || !hijriEl) return;
+        if (!todayEl || !enEl || !hijriEl) return;
+
+        // Function to update visibility
+        const updateVisibility = () => {
+            todayEl.classList.remove('active');
+            enEl.classList.remove('active');
+            hijriEl.classList.remove('active');
+
+            if (state === 0) todayEl.classList.add('active');
+            else if (state === 1) enEl.classList.add('active');
+            else if (state === 2) hijriEl.classList.add('active');
+        };
+
+        // Initial Set
+        updateVisibility();
 
         this.dateToggleInterval = setInterval(() => {
-            showEnglish = !showEnglish;
-            if (showEnglish) {
-                enEl.classList.add('active');
-                hijriEl.classList.remove('active');
-            } else {
-                enEl.classList.remove('active');
-                hijriEl.classList.add('active');
-            }
-        }, 5000); // Toggle every 5 seconds
+            state = (state + 1) % 3; // Cycle 0 -> 1 -> 2 -> 0
+            updateVisibility();
+        }, 3000); // Cycle every 3 seconds (faster for 3 items)
     }
 
     startLiveTimer() {
