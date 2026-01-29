@@ -1,20 +1,75 @@
-<div class="page-content">
-    <!-- Date -->
-    <div id="currentDate"></div>
+<div class="page-content home-container">
+    <!-- Info Section (Header) -->
+    <div class="home-header">
+        <div class="date-container">
+            <span id="date-en" class="date-text active">Loading Date...</span>
+            <span id="date-hijri" class="date-text">Loading Hijri...</span>
+        </div>
+        <div class="location-container">
+            <i class="ph-fill ph-map-pin"></i>
+            <span id="location-text">Dhaka, BD</span>
+        </div>
+    </div>
 
-    <!-- Prayer ranges -->
-    <div id="fajr"></div>
-    <div id="dhuhr"></div>
-    <div id="asr"></div>
-    <div id="maghrib"></div>
-    <div id="isha"></div>
-    <div id="tahajjud"></div>
+    <!-- Dashboard Section -->
+    <div class="dashboard-card">
+        <!-- Dashboard Left: Info -->
+        <div class="dashboard-left">
+            <div class="dash-item">
+                <span class="dash-label">Now</span>
+                <div class="dash-value">
+                    <span id="current-prayer-name">--</span>
+                    <span id="current-prayer-time">--:--</span>
+                </div>
+            </div>
+            <div class="dash-item">
+                <span class="dash-label">Next</span>
+                <div class="dash-value">
+                    <span id="next-prayer-name">--</span>
+                    <span id="next-prayer-time">--:--</span>
+                </div>
+            </div>
+            <div class="dash-row">
+                <div class="dash-mini">
+                    <i class="ph ph-sun"></i>
+                    <span id="sunrise-time">--:--</span>
+                </div>
+                <div class="dash-mini">
+                    <i class="ph ph-moon"></i>
+                    <span id="sunset-time">--:--</span>
+                </div>
+            </div>
+        </div>
 
-    <!-- Forbidden times -->
-    <ul id="forbiddenTimes"></ul>
+        <!-- Dashboard Right: Countdown Circle -->
+        <div class="dashboard-right">
+            <div class="countdown-circle">
+                <svg viewBox="0 0 100 100">
+                    <circle class="circle-bg" cx="50" cy="50" r="45"></circle>
+                    <circle id="countdown-progress" class="circle-progress" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <div class="countdown-text">
+                    <span id="countdown-timer">--:--</span>
+                    <span class="countdown-label">Msg</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Navigation -->
-    <button id="prevDay">◀</button>
-    <button id="nextDay">▶</button>
+    <!-- Full Schedule List -->
+    <div class="prayer-list-compact card">
+        <div class="p-row"><span>Fajr</span> <span id="fajr">--:--</span></div>
+        <div class="p-row"><span>Dhuhr</span> <span id="dhuhr">--:--</span></div>
+        <div class="p-row"><span>Asr</span> <span id="asr">--:--</span></div>
+        <div class="p-row"><span>Maghrib</span> <span id="maghrib">--:--</span></div>
+        <div class="p-row"><span>Isha</span> <span id="isha">--:--</span></div>
+        <div class="p-row"><span>Tahajjud</span> <span id="tahajjud">--:--</span></div>
+    </div>
 
+    <!-- Navigation Buttons -->
+    <div class="day-navigation">
+        <button id="prevDay" class="nav-btn"><i class="ph ph-caret-left"></i></button>
+        <span id="currentDateDisplay">Today</span>
+        <button id="nextDay" class="nav-btn"><i class="ph ph-caret-right"></i></button>
+    </div>
 </div>
