@@ -417,30 +417,38 @@ body {
     padding: 16px;
     margin-bottom: 20px;
     border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    overflow-x: auto;
+    /* Allow scroll if too tight */
+    gap: 8px;
 }
 
 .p-row {
     display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.95rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Individual border */
+    border-radius: 12px;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    /* Uppercase prayer names */
     letter-spacing: 0.5px;
+    flex: 1;
+    /* Distribute space */
+    min-width: 60px;
 }
 
 /* Highlight Active Row */
 .highlight-row {
-    background: rgba(16, 185, 81, 0.1);
-    /* Primary color low opacity */
-    border-radius: 8px;
-    padding: 10px 10px;
-    /* Adjust padding for bg */
-    margin: 0 -10px;
-    /* Negative margin to keep alignment */
-    border-bottom: none;
-    font-weight: 700;
+    background: rgba(16, 185, 81, 0.15);
+    /* Stronger highlight bg */
+    border: 1px solid var(--primary);
+    margin: 0;
+    /* Reset margins */
+    padding: 8px 12px;
 }
 
 .highlight-row span {
@@ -448,12 +456,16 @@ body {
 }
 
 .p-row:last-child {
-    border-bottom: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Reset border removal */
 }
 
+/* Specific styling for the vertical inputs inside horizontal item */
 .p-row span:last-child {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-main);
+    margin-top: 4px;
+    font-size: 1rem;
 }
 
 .day-navigation {
