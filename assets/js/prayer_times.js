@@ -1,19 +1,12 @@
-/* =======================
+/* ======================================================
    Utility helpers
-======================= */
+====================================================== */
 const addMinutes = (d, m) => new Date(d.getTime() + m * 60000);
 const subMinutes = (d, m) => new Date(d.getTime() - m * 60000);
 
-const format12 = (d) =>
-    d.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-    });
-
-/* =======================
+/* ======================================================
    Prayer Times Engine
-======================= */
+====================================================== */
 class PrayerTimes {
     static METHODS = {
         MWL: { fajr: 18, isha: 17 },
@@ -45,12 +38,12 @@ class PrayerTimes {
             hanafi,
         });
 
-        // Umm al-Qura fixed Isha
+        // Umm al-Qura Isha (fixed minutes)
         if (cfg.ishaInterval) {
             times.Isha = addMinutes(times.Maghrib, cfg.ishaInterval);
         }
 
-        // Apply configurable offsets
+        // Apply offsets
         for (const k in offsets) {
             if (times[k]) times[k] = addMinutes(times[k], offsets[k]);
         }
@@ -59,9 +52,9 @@ class PrayerTimes {
     }
 }
 
-/* =======================
+/* ======================================================
    Solar Math (Core)
-======================= */
+====================================================== */
 class SolarTimes {
     static calculate({
         latitude,
@@ -142,7 +135,7 @@ class SolarTimes {
             return toDate(noon + (after ? deg(h) : -deg(h)) / 15);
         };
 
-        // ✅ Correct Asr (shadow-based)
+        // Correct Asr (shadow-based)
         const factor = hanafi ? 2 : 1;
         const asrH = Math.acos(
             clamp(
@@ -163,10 +156,10 @@ class SolarTimes {
     }
 }
 
-/* =======================
-   Prayer Ranges & Fiqh
-======================= */
-function buildPrayerSchedule(times) {
+/* ======================================================
+   Prayer Ranges & Forbidden Times
+====================================================== */
+function buildPrayerRanges(times) {
     const night =
         times.Fajr.getTime() + 86400000 - times.Maghrib.getTime();
 
@@ -175,30 +168,68 @@ function buildPrayerSchedule(times) {
         times.Maghrib.getTime() + (2 / 3) * night
     );
 
-    const ranges = {
-        Fajr: [times.Fajr, subMinutes(times.Sunrise, 1)],
-        Dhuhr: [times.Dhuhr, subMinutes(times.Asr, 1)],
-        Asr: [times.Asr, subMinutes(times.Maghrib, 15)],
-        Maghrib: [times.Maghrib, subMinutes(times.Isha, 1)],
-        Isha: [times.Isha, midnight],
-        Tahajjud: [tahajjudStart, subMinutes(times.Fajr, 1)],
-    };
-
-    const forbidden = [
-        ["After Sunrise", times.Sunrise, addMinutes(times.Sunrise, 15)],
-        ["Zawal", subMinutes(times.Dhuhr, 6), times.Dhuhr],
-        ["Before Sunset", subMinutes(times.Maghrib, 15), times.Maghrib],
-    ];
-
     return {
-        prayers: Object.fromEntries(
-            Object.entries(ranges).map(([k, v]) => [
-                k,
-                `${format12(v[0])} – ${format12(v[1])}`,
-            ])
-        ),
-        forbidden: forbidden.map(
-            ([n, s, e]) => `${n}: ${format12(s)} – ${format12(e)}`
-        ),
+        Fajr: { start: times.Fajr, end: subMinutes(times.Sunrise, 1) },
+        Dhuhr: { start: times.Dhuhr, end: subMinutes(times.Asr, 1) },
+        Asr: { start: times.Asr, end: subMinutes(times.Maghrib, 15) },
+        Maghrib: { start: times.Maghrib, end: subMinutes(times.Isha, 1) },
+        Isha: { start: times.Isha, end: midnight },
+        Tahajjud: { start: tahajjudStart, end: subMinutes(times.Fajr, 1) },
+    };
+}
+
+function buildForbiddenRanges(times) {
+    return [
+        {
+            name: "After Sunrise",
+            start: times.Sunrise,
+            end: addMinutes(times.Sunrise, 15),
+        },
+        {
+            name: "Zawal",
+            start: subMinutes(times.Dhuhr, 6),
+            end: times.Dhuhr,
+        },
+        {
+            name: "Before Sunset",
+            start: subMinutes(times.Maghrib, 15),
+            end: times.Maghrib,
+        },
+    ];
+}
+
+/* ======================================================
+   Current Prayer / Forbidden State Logic
+====================================================== */
+function getCurrentPrayerState(times, now = new Date()) {
+    const prayerRanges = buildPrayerRanges(times);
+    const forbiddenRanges = buildForbiddenRanges(times);
+
+    // 1️⃣ Forbidden times FIRST
+    for (const f of forbiddenRanges) {
+        if (now >= f.start && now < f.end) {
+            return {
+                state: "FORBIDDEN",
+                reason: f.name,
+                remainingMs: f.end - now,
+            };
+        }
+    }
+
+    // 2️⃣ Permissible prayer times
+    for (const [name, range] of Object.entries(prayerRanges)) {
+        if (now >= range.start && now <= range.end) {
+            return {
+                state: "PRAYER",
+                prayer: name,
+                remainingMs: range.end - now,
+            };
+        }
+    }
+
+    // 3️⃣ Neutral time
+    return {
+        state: "NEUTRAL",
+        remainingMs: null,
     };
 }
